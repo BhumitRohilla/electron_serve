@@ -1,6 +1,6 @@
 {
   "name": "@bhumit_rohilla/electron_serve",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Electron Serve For Static Site",
   "main": "index.mjs",
   "type": "module",

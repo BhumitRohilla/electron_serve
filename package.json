@@ -1,15 +1,21 @@
 {
   "name": "@bhumit_rohilla/electron_serve",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Electron Serve For Static Site",
-  "main": "index.js",
-  "dependencies": {
+  "main": "index.mjs",
+  "type": "module",
+  "exports": {
+    "import": "./index.mjs",
+    "require": "./index.cjs"
   },
+  "dependencies": {},
   "devDependencies": {
-    "@types/electron": "^1.6.10"
+    "@types/electron": "^1.6.10",
+    "rollup": "^4.17.2"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "pub": "rollup .\\index.mjs --file .\\index.cjs --format cjs && yarn publish"
   },
   "author": "",
   "license": "ISC"

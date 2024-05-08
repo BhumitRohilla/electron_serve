@@ -1,0 +1,16 @@
+{
+  "name": "@bhumit_rohilla/electron_serve",
+  "version": "0.0.1",
+  "description": "Electron Serve For Static Site",
+  "main": "index.js",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "@types/electron": "^1.6.10"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

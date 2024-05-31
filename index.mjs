@@ -1,22 +1,22 @@
-import path from 'path';
-import fs from 'fs';
-import {app, protocol} from 'electron';
+const path = require('path');
+const fs = require('fs');
+const { app, protocol } = require('electron')
 
 
-/** @typedef  {{path: string, fallbackFile: string | null, protocolConfig: Electron.CustomScheme, handlers: {host: string, (req : Electron.Request, res: Electron.Response) => void}}} config*/
+/** @typedef  {{path: string, protocolConfig: Electron.CustomScheme, handlers: {host: string, (req : Electron.Request, res: Electron.Response) => void}, defaultFilePath?: string}} config*/
 
 /**
  * 
  * @param {config} config 
  */
-export default function createServe({path, handlers = {}, protocolConfig, fallbackFile = null}) {
+export default function createServe({path, handlers = {}, protocolConfig, defaultFilePath}) {
     if (!path) throw new Error('Please provide the Path of the static build');
     if (!protocolConfig) throw new Error('Please provide configuration for the protocol');
     if (!protocolConfig?.scheme) throw new Error('Please provide custom_protocol');
 
     protocol.registerSchemesAsPrivileged([protocolConfig])
 
-    const buildFileHandler = createBuildFileHandler(path, fallbackFile);
+    const buildFileHandler = createBuildFileHandler(path, defaultFilePath);
     app.addListener('ready', () => {
         protocol.handle(protocolConfig.scheme, (req, res) => {
             const {host, pathname} = new URL(req.url);
@@ -76,32 +76,19 @@ const getContentTypeFromExtension = (ext) => {
     }
 }
 
-/**
- * 
- * @param {string} path_
- * @param {string | null} fallbackFile 
- * @returns 
- */
-function createBuildFileHandler(path_, fallbackFile) {
+function createBuildFileHandler(path_, defaultFilePath) {
+    const indexFilePath = defaultFilePath? defaultFilePath :path.join(path_, 'index.html');
     try {
-        if (fallbackFile) {
-            const fallbackFileState = fs.existsSync(fallbackFile);
-            if (!fallbackFileState) throw new Error('t');
-        }
+        const indexFileStat = fs.existsSync(indexFilePath);
+        if (!indexFileStat) throw new Error('TEST');
     } catch (error) {
-        throw new Error(`Provided fallbackFile not found: ${fallbackFile}.`);
+        throw new Error(`Default file or index.html file not found ${indexFilePath}.`);
     }
     return async function(request){
         const pathName = new URL(request.url).pathname;
         const filePath = path.join(path_, pathName);
         let fileName = await readForFile(filePath);
-        if (!fileName) fileName = fallbackFile;
-        if (!fileName) {
-            return new Response('bad', {
-                status: 404,
-                statusText: 'Not Found'
-            })
-        }  
+        if (!fileName) fileName = indexFilePath;
         const extension = path.extname(fileName);
         const contentType = getContentTypeFromExtension(extension);
         return new Response(fs.ReadStream(fileName), {
